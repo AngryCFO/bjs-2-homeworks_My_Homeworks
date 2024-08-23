@@ -1,3 +1,5 @@
+"use strict";
+
 // Задача 1
 function getArrayParams(...arr) {
   if (arr.length === 0) {

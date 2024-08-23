@@ -43,7 +43,7 @@ function calculateTotalMortgage(percent, contribution, amount, countMonths) {
   const monthlyPayment = creditBody * (monthlyRate + (monthlyRate / (((1 + monthlyRate) ** countMonths) - 1)));
 
   // Расчет общей суммы
-  const totalAmount = monthlyPayment * countMonths + contribution;
+  const totalAmount = monthlyPayment * countMonths;
 
   // Округление до двух знаков после запятой
   return Number(totalAmount.toFixed(2));

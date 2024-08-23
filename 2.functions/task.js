@@ -41,7 +41,7 @@ function averageEvenElementsWorker(...arr) {
   if (arr.length === 0) return 0;
   const evenNums = arr.filter(num => num % 2 === 0);
   if (evenNums.length === 0) return 0;
-  return evenNums.reduce((sum, num) => sum + num, 0) / evenNums.length;
+  return Math.round(evenNums.reduce((sum, num) => sum + num, 0) / evenNums.length);
 }
 
 // Задача 3
@@ -57,6 +57,16 @@ function makeWork(arrOfArr, func) {
 
   return maxWorkerResult;
 }
+
+// Экспортируем функции для тестирования
+module.exports = {
+  getArrayParams,
+  summElementsWorker,
+  differenceMaxMinWorker,
+  differenceEvenOddWorker,
+  averageEvenElementsWorker,
+  makeWork
+};
 
 // Тесты
 console.log("Задача 1:");

@@ -27,7 +27,7 @@ class Student {
   if (subjects.length === 0) {
     return 0;
   }
-  const sum = subjects.reduce((acc, subject) => acc + this.getAverageBySubject(subject), 0);
+  const sum = subjects.reduce((acc, subject) => acc + this.getAverageBySubject(subject) || 0, 0);
   return sum / subjects.length;
 }
 

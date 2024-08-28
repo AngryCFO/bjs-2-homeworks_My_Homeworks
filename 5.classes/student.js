@@ -22,7 +22,7 @@ class Student {
     return sum / this.marks[subject].length;
   }
 
-  getAverage() {
+ getAverage() {
   const subjects = Object.keys(this.marks);
   if (subjects.length === 0) {
     return 0;

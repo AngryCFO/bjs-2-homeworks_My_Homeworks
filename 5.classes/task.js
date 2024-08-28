@@ -63,6 +63,7 @@ class DetectiveBook extends Book {
   }
 }
 
+
 // Задача 2. Библиотека
 class Library {
   constructor(name) {
@@ -76,19 +77,20 @@ class Library {
     }
   }
 
-  findBookBy(type, value) {
-    return this.books.find((book) => book[type] === value) || null;
+  findBookBy(key, value) {
+    return this.books.find((book) => book[key] === value) || null;
   }
 
   giveBookByName(bookName) {
     const book = this.findBookBy("name", bookName);
     if (book) {
-      this.books = this.books.filter((b) => b !== book);
+      this.books.splice(this.books.indexOf(book), 1);
       return book;
     }
     return null;
   }
 }
+
 
 // Задача 3. Журнал успеваемости
 class Student {
@@ -98,9 +100,6 @@ class Student {
   }
 
   addMark(mark, subject) {
-    if (typeof mark !== 'number' || typeof subject !== 'string') {
-      throw new Error('Неправильный тип данных');
-    }
     if (mark >= 2 && mark <= 5) {
       if (!this.marks[subject]) {
         this.marks[subject] = [];
@@ -110,7 +109,7 @@ class Student {
   }
 
   getAverageBySubject(subject) {
-    if (!this.marks[subject] || this.marks[subject].length === 0) {
+    if (!this.marks[subject]) {
       return 0;
     }
     const sum = this.marks[subject].reduce((acc, mark) => acc + mark, 0);
@@ -119,12 +118,14 @@ class Student {
 
   getAverage() {
     const subjects = Object.keys(this.marks);
-    if (subjects.length === 0) {
-      return 0;
-    }
-    const sum = subjects.reduce((acc, subject) => acc + this.marks[subject].reduce((acc, mark) => acc + mark, 0), 0);
-    return sum / subjects.reduce((acc, subject) => acc + this.marks[subject].length, 0);
+    const sum = subjects.reduce((acc, subject) => acc + this.getAverageBySubject(subject), 0);
+    return sum / subjects.length;
   }
 }
 
-}
+const student = new Student("Олег Никифоров");
+student.addMark(5, "химия");
+student.addMark(5, "химия");
+student.addMark(5, "физика");
+student.addMark(4, "физика");
+student.addMark(6, "физика"); // Оценка не добавится, так как

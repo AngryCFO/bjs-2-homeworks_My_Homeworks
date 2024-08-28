@@ -1,4 +1,4 @@
-// Задача 1. Печатное издание
+/ Задача 1. Печатное издание
 class PrintEditionItem {
   constructor(name, releaseDate, pagesCount) {
     this.name = name;

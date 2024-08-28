@@ -62,9 +62,18 @@ class DetectiveBook extends Book {
     this.type = "detective";
   }
 }
+module.exports = {
+  PrintEditionItem,
+  Magazine,
+  Book,
+  NovelBook,
+  FantasticBook,
+  DetectiveBook
+};
 
 
 // Задача 2. Библиотека
+const { PrintEditionItem, Magazine, Book, NovelBook, FantasticBook, DetectiveBook } = require('./task1');
 class Library {
   constructor(name) {
     this.name = name;

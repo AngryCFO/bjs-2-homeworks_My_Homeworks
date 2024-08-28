@@ -1,34 +1,38 @@
-// Определяем Student как свойство глобального объекта window
-window.Student = function(name, gender, age) {
-    this.name = name;
-    this.gender = gender;
-    this.age = age;
-    this.marks = [];
-};
-
-window.Student.prototype.setSubject = function(subjectName) {
-    this.subject = subjectName;
-};
-
-window.Student.prototype.addMarks = function(...marksToAdd) {
-    if (!this.excluded) {
-        this.marks.push(...marksToAdd);
+(function(global) {
+    function Student(name, gender, age) {
+        this.name = name;
+        this.gender = gender;
+        this.age = age;
+        this.marks = [];
     }
-};
 
-window.Student.prototype.getAverage = function() {
-    if (!this.marks || this.marks.length === 0) {
-        return 0;
-    }
-    const sum = this.marks.reduce((acc, mark) => acc + mark, 0);
-    return sum / this.marks.length;
-};
+    Student.prototype.setSubject = function(subjectName) {
+        this.subject = subjectName;
+    };
 
-window.Student.prototype.exclude = function(reason) {
-    this.excluded = reason;
-    delete this.subject;
-    delete this.marks;
-};
+    Student.prototype.addMarks = function(...marksToAdd) {
+        if (!this.excluded) {
+            this.marks.push(...marksToAdd);
+        }
+    };
+
+    Student.prototype.getAverage = function() {
+        if (!this.marks || this.marks.length === 0) {
+            return 0;
+        }
+        const sum = this.marks.reduce((acc, mark) => acc + mark, 0);
+        return sum / this.marks.length;
+    };
+
+    Student.prototype.exclude = function(reason) {
+        this.excluded = reason;
+        delete this.subject;
+        delete this.marks;
+    };
+
+    // Экспортируем Student в глобальную область видимости
+    global.Student = Student;
+})(typeof window !== 'undefined' ? window : global);
 
 // Пример использования (можно закомментировать при запуске тестов):
 /*

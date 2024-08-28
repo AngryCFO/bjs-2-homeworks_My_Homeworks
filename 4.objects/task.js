@@ -1,22 +1,22 @@
-// Используем var для создания глобальной переменной
-var Student = function(name, gender, age) {
+// Определяем Student как свойство глобального объекта window
+window.Student = function(name, gender, age) {
     this.name = name;
     this.gender = gender;
     this.age = age;
     this.marks = [];
 };
 
-Student.prototype.setSubject = function(subjectName) {
+window.Student.prototype.setSubject = function(subjectName) {
     this.subject = subjectName;
 };
 
-Student.prototype.addMarks = function(...marksToAdd) {
+window.Student.prototype.addMarks = function(...marksToAdd) {
     if (!this.excluded) {
         this.marks.push(...marksToAdd);
     }
 };
 
-Student.prototype.getAverage = function() {
+window.Student.prototype.getAverage = function() {
     if (!this.marks || this.marks.length === 0) {
         return 0;
     }
@@ -24,7 +24,7 @@ Student.prototype.getAverage = function() {
     return sum / this.marks.length;
 };
 
-Student.prototype.exclude = function(reason) {
+window.Student.prototype.exclude = function(reason) {
     this.excluded = reason;
     delete this.subject;
     delete this.marks;

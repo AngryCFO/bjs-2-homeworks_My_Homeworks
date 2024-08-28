@@ -30,5 +30,4 @@ class Student {
   const sum = subjects.reduce((acc, subject) => acc + this.getAverageBySubject(subject), 0);
   return sum / subjects.length;
 }
-
 }

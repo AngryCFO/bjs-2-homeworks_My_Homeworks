@@ -1,19 +1,19 @@
-function Student(name, gender, age) {
+// Используем var для создания глобальной переменной
+var Student = function(name, gender, age) {
     this.name = name;
     this.gender = gender;
     this.age = age;
     this.marks = [];
-}
+};
 
 Student.prototype.setSubject = function(subjectName) {
     this.subject = subjectName;
 };
 
 Student.prototype.addMarks = function(...marksToAdd) {
-    if (this.excluded) {
-        return;
+    if (!this.excluded) {
+        this.marks.push(...marksToAdd);
     }
-    this.marks.push(...marksToAdd);
 };
 
 Student.prototype.getAverage = function() {
@@ -30,7 +30,8 @@ Student.prototype.exclude = function(reason) {
     delete this.marks;
 };
 
-// Пример использования:
+// Пример использования (можно закомментировать при запуске тестов):
+/*
 let student1 = new Student("Василиса", "женский", 19);
 student1.setSubject("Algebra");
 console.log(student1.getAverage()); // 0
@@ -42,3 +43,4 @@ let student2 = new Student("Артём", "мужской", 25);
 student2.setSubject("Geometry");
 student2.exclude('плохая учёба');
 console.log(student2);
+*/

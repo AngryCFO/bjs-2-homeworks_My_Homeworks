@@ -73,7 +73,7 @@ class AlarmClock {
 
   clearAlarms() {
     this.stop(); // Останавливаем интервал
-    this.alarmCollection = []; // Очистка всех звонков
+    this.alarmCollection.length = 0; // Полностью очищаем коллекцию звонков
   }
 }
 

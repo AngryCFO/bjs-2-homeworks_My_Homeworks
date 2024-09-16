@@ -45,6 +45,7 @@ function debounceDecoratorNew(func, delay) {
 
   function wrapper(...args) {
     allCallCount++; // Увеличиваем количество вызовов декоратора
+
     if (timeoutId === null) {
       func(...args); // Немедленный вызов функции
       callCount++; // Увеличиваем количество вызовов функции
@@ -63,6 +64,7 @@ function debounceDecoratorNew(func, delay) {
   return wrapper;
 }
 
+
 //Пример использования:
 const sendSignal = (signalOrder, delay) => console.log("Сигнал отправлен", signalOrder, delay);
 const upgradedSendSignal = debounceDecoratorNew(sendSignal, 2000);
@@ -76,6 +78,7 @@ setTimeout(() => upgradedSendSignal(6, 4400), 4400); // проигнориров
 setTimeout(() => upgradedSendSignal(7, 4500), 4500); // Сигнал будет отправлен
 
 setTimeout(() => {
-  console.log(upgradedSendSignal.count()); // было выполнено 3 отправки сигнала
-  console.log(upgradedSendSignal.allCount()); // было выполнено 6 вызовов декорированной функции
+  console.log(upgradedSendSignal.count()); // Количество вызовов функции
+  console.log(upgradedSendSignal.allCount()); // Общее количество вызовов декоратора
 }, 7000);
+

@@ -1,6 +1,6 @@
 class AlarmClock {
   constructor() {
-    this.alarmCollection = new Map();
+    this.alarmCollection = [];
     this.intervalId = null;
   }
 
@@ -9,19 +9,21 @@ class AlarmClock {
       throw new Error('Отсутствуют обязательные аргументы');
     }
 
-    if (this.alarmCollection.has(time)) {
+    const existingAlarm = this.alarmCollection.find(alarm => alarm.time === time);
+    if (existingAlarm) {
       console.warn('Уже присутствует звонок на это же время');
       return;
     }
 
-    this.alarmCollection.set(time, {
-      callback: callback,
+    this.alarmCollection.push({
+      callback,
+      time,
       canCall: true
     });
   }
 
   removeClock(time) {
-    this.alarmCollection.delete(time);
+    this.alarmCollection = this.alarmCollection.filter(alarm => alarm.time !== time);
   }
 
   getCurrentFormattedTime() {
@@ -31,32 +33,52 @@ class AlarmClock {
     return `${hours}:${minutes}`;
   }
 
-  async start() {
+  start() {
     if (this.intervalId !== null) {
-      return; // Интервал уже запущен
+      return;
     }
 
-    while (true) {
+    this.intervalId = setInterval(() => {
       const currentTime = this.getCurrentFormattedTime();
-      for (const [time, clock] of this.alarmCollection) {
-        if (time === currentTime && clock.canCall) {
-          clock.canCall = false;
-          await new Promise(resolve => clock.callback(resolve));
+      this.alarmCollection.forEach(alarm => {
+        if (alarm.time === currentTime && alarm.canCall) {
+          alarm.canCall = false;
+          alarm.callback();
         }
-      }
-      await new Promise(resolve => setTimeout(resolve, 1000));
-    }
+      });
+    }, 1000);
   }
 
   stop() {
-    if (this.intervalId !== null) {
-      clearInterval(this.intervalId);
-      this.intervalId = null;
-    }
+    clearInterval(this.intervalId);
+    this.intervalId = null;
   }
 
   resetAllCalls() {
-    for (const clock of this.alarmCollection.values()) {
-      clock.canCall = true;
-    }
-  
+    this.alarmCollection.forEach(alarm => {
+      alarm.canCall = true;
+    });
+  }
+
+  clearAlarms() {
+    this.stop();
+    this.alarmCollection = [];
+  }
+}
+//Пример использования:
+const alarmClock = new AlarmClock();
+
+alarmClock.addClock('07:30', () => {
+  console.log('Время вставать!');
+});
+
+alarmClock.addClock('22:00', () => {
+  console.log('Пора спать!');
+});
+
+alarmClock.start();
+
+// Через некоторое время
+alarmClock.removeClock('22:00');
+alarmClock.stop();
+alarmClock.clearAlarms();

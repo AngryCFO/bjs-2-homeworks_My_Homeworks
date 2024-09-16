@@ -65,3 +65,4 @@ class AlarmClock {
     this.alarmCollection = [];
   }
 }
+export { AlarmClock };

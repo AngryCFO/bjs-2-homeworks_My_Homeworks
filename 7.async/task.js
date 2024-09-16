@@ -70,13 +70,13 @@ class AlarmClock {
     });
   }
 
-  clearAlarms() {
-    if (this.intervalId) {
-      this.stop();
-    }
-
-    this.alarmCollection = [];
+clearAlarms() {
+  if (this.intervalId) {
+    clearInterval(this.intervalId);
   }
+  this.alarmCollection = [];
+  this.intervalId = null;
+}
 }
 
 //Пример использования:

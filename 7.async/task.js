@@ -4,16 +4,15 @@ class AlarmClock {
     this.intervalId = null;
   }
 
-  addClock(time, callback, id) {
+  addClock(time, callback) {
     if (!time || !callback) {
       throw new Error('Отсутствуют обязательные аргументы');
     }
     if (typeof callback !== 'function') {
       throw new Error('Колбэк должен быть функцией');
     }
-    const newAlarm = { time, callback, canCall: true, id: id || Date.now().toString() };
+    const newAlarm = { time, callback, canCall: true };
     this.alarmCollection.push(newAlarm);
-    return newAlarm.id;
   }
 
   removeClock(time) {

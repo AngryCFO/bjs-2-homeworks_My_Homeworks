@@ -65,20 +65,3 @@ class AlarmClock {
     this.alarmCollection = [];
   }
 }
-//Пример использования:
-const alarmClock = new AlarmClock();
-
-alarmClock.addClock('07:30', () => {
-  console.log('Время вставать!');
-});
-
-alarmClock.addClock('22:00', () => {
-  console.log('Пора спать!');
-});
-
-alarmClock.start();
-
-// Через некоторое время
-alarmClock.removeClock('22:00');
-alarmClock.stop();
-alarmClock.clearAlarms();

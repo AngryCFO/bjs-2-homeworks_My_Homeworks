@@ -1,6 +1,6 @@
 class AlarmClock {
   constructor() {
-    this.alarmCollection = [];
+    this.alarmCollection = new Map();
     this.intervalId = null;
   }
 
@@ -9,22 +9,19 @@ class AlarmClock {
       throw new Error('Отсутствуют обязательные аргументы');
     }
 
-    // Проверка на дублирование времени
-    if (this.alarmCollection.some(clock => clock.time === time)) {
+    if (this.alarmCollection.has(time)) {
       console.warn('Уже присутствует звонок на это же время');
       return;
     }
 
-    // Добавление нового звонка
-    this.alarmCollection.push({
-      time: time,
+    this.alarmCollection.set(time, {
       callback: callback,
       canCall: true
     });
   }
 
   removeClock(time) {
-    this.alarmCollection = this.alarmCollection.filter(clock => clock.time !== time);
+    this.alarmCollection.delete(time);
   }
 
   getCurrentFormattedTime() {
@@ -34,20 +31,21 @@ class AlarmClock {
     return `${hours}:${minutes}`;
   }
 
-  start() {
+  async start() {
     if (this.intervalId !== null) {
       return; // Интервал уже запущен
     }
 
-    this.intervalId = setInterval(() => {
+    while (true) {
       const currentTime = this.getCurrentFormattedTime();
-      this.alarmCollection.forEach(clock => {
-        if (clock.time === currentTime && clock.canCall) {
-          clock.canCall = false; // Устанавливаем canCall в false
-          clock.callback(); // Вызываем коллбек
+      for (const [time, clock] of this.alarmCollection) {
+        if (time === currentTime && clock.canCall) {
+          clock.canCall = false;
+          await new Promise(resolve => clock.callback(resolve));
         }
-      });
-    }, 1000); // Проверяем каждую секунду
+      }
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
   }
 
   stop() {
@@ -58,29 +56,7 @@ class AlarmClock {
   }
 
   resetAllCalls() {
-    this.alarmCollection.forEach(clock => {
+    for (const clock of this.alarmCollection.values()) {
       clock.canCall = true;
-    });
-  }
-
-  clearAlarms() {
-    this.stop(); // Останавливаем интервал
-    this.alarmCollection = []; // Очищаем коллекцию звонков
-  }
-}
-
-// Пример использования:
-const alarmClock = new AlarmClock();
-
-alarmClock.addClock('08:00', () => console.log('Просыпайся!'));
-alarmClock.addClock('09:00', () => console.log('Время на пару!'));
-
-console.log(alarmClock.getCurrentFormattedTime()); // Выводит текущее время в формате HH:MM
-
-alarmClock.start(); // Запускает будильник
-
-// Через некоторое время, можно остановить будильник и очистить все звонки
-setTimeout(() => {
-  alarmClock.stop();
-  alarmClock.clearAlarms();
-}, 60000); // Останавливаем и очищаем через 1 минуту
+    }
+  

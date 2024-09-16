@@ -57,4 +57,9 @@ class AlarmClock {
       alarm.canCall = true;
     });
   }
+
+  // Новый метод для получения "чистой" версии коллекции будильников
+  getAlarmCollection() {
+    return this.alarmCollection.map(({ time, callback, canCall }) => ({ time, callback, canCall }));
+  }
 }

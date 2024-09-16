@@ -1,7 +1,7 @@
 class AlarmClock {
   constructor() {
     this.alarmCollection = [];
-    this.timerId = null;
+    this.intervalId = null;
   }
 
   addClock(time, callback, id) {
@@ -18,12 +18,11 @@ class AlarmClock {
     if (id !== undefined && typeof id !== 'string') {
       throw new Error('id должен быть строкой');
     }
-    const existingAlarm = this.alarmCollection.find(alarm => alarm.id === id);
+    const existingAlarm = this.alarmCollection.find(alarm => alarm.time === time);
     if (existingAlarm) {
-      console.warn('Звонок с таким id уже существует');
-      return existingAlarm.id;
+      console.warn('Уже присутствует звонок на это же время');
     }
-    const newAlarm = { time, callback, id: id || Date.now().toString() };
+    const newAlarm = { time, callback, canCall: true, id: id || Date.now().toString() };
     this.alarmCollection.push(newAlarm);
     return newAlarm.id;
   }
@@ -43,33 +42,77 @@ class AlarmClock {
   }
 
   start() {
-    if (this.timerId) {
+    if (this.intervalId) {
+      console.warn('Будильник уже запущен');
       return;
     }
-    this.timerId = setInterval(() => {
+    if (this.alarmCollection.length === 0) {
+      console.warn('Коллекция звонков пуста');
+      return;
+    }
+    this.intervalId = setInterval(() => {
+      const currentTime = this.getCurrentFormattedTime();
       this.alarmCollection.forEach(alarm => {
-        if (alarm.time === this.getCurrentFormattedTime()) {
-          alarm.callback();
+        if (alarm.time === currentTime && alarm.canCall) {
+          alarm.canCall = false;
+          try {
+            alarm.callback();
+          } catch (error) {
+            console.error(`Ошибка при выполнении колбэка для будильника ${alarm.id}:`, error);
+          }
         }
       });
     }, 1000);
   }
 
   stop() {
-    if (this.timerId) {
-      clearInterval(this.timerId);
-      this.timerId = null;
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+      this.intervalId = null;
+    } else {
+      console.warn('Будильник не запущен');
     }
   }
 
-  printAlarms() {
+  resetAllCalls() {
     this.alarmCollection.forEach(alarm => {
-      console.log(`Будильник №${alarm.id} заведен на ${alarm.time}`);
+      alarm.canCall = true;
     });
   }
 
   clearAlarms() {
     this.stop();
-    this.alarmCollection = [];
+    // Вместо очистки коллекции, устанавливаем canCall в false для всех будильников
+    this.alarmCollection.forEach(alarm => {
+      alarm.canCall = false;
+    });
+  }
+
+  printAlarms() {
+    console.log('Текущие будильники:');
+    this.alarmCollection.forEach(alarm => {
+      console.log(`ID: ${alarm.id}, Время: ${alarm.time}, Может быть вызван: ${alarm.canCall}`);
+    });
   }
 }
+
+// Пример использования:
+const alarmClock = new AlarmClock();
+const morningAlarmId = alarmClock.addClock('08:00', () => console.log('Пора вставать!'), 'morning');
+const lunchAlarmId = alarmClock.addClock('12:00', () => console.log('Время обеда!'), 'lunch');
+alarmClock.start();
+
+// Чтобы остановить будильник
+// alarmClock.stop();
+
+// Чтобы сбросить возможность запуска всех звонков
+// alarmClock.resetAllCalls();
+
+// Чтобы удалить конкретный будильник
+// alarmClock.removeClock(morningAlarmId);
+
+// Чтобы очистить все звонки (установить canCall в false)
+// alarmClock.clearAlarms();
+
+// Чтобы вывести все текущие будильники
+// alarmClock.printAlarms();

@@ -74,8 +74,8 @@ clearAlarms() {
   if (this.intervalId) {
     clearInterval(this.intervalId);
   }
-  this.alarmCollection = this.alarmCollection.map(alarm => ({ ...alarm, canCall: true }));
-  this.alarmCollection = [];
+  this.alarmCollection.forEach(alarm => alarm.canCall = true);
+  this.alarmCollection.length = 0;
   this.intervalId = null;
 }
 

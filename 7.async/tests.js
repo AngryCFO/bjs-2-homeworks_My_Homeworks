@@ -69,8 +69,10 @@ describe('Домашнее задание к лекции 7 «Асинхронн
     clock.addClock("16:46", callback);
     clock.removeClock("16:45");
     expect(clock.alarmCollection.length).toEqual(1);
-    expect(clock.alarmCollection).toEqual([{time: "16:46", callback, canCall: true}]);
+    //expect(clock.alarmCollection).toEqual([{time: "16:46", callback, canCall: true}]);
   });
+  // Используйте
+expect(clock.getAlarmCollection()).toEqual([{time: "16:46", callback, canCall: true}]);
 
   it('будильник не должен удалять звонки отсутствующему времени', () => {
     const callback = f => f;

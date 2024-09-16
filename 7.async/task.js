@@ -4,55 +4,62 @@ class AlarmClock {
     this.intervalId = null;
   }
 
-  addClock(time, callback) {
+  addClock(time, callback, id) {
     if (!time || !callback) {
       throw new Error('Отсутствуют обязательные аргументы');
     }
-
+    if (typeof callback !== 'function') {
+      throw new Error('Колбэк должен быть функцией');
+    }
     const timeRegex = /^([01][0-9]|2[0-3]):[0-5][0-9]$/;
     if (!timeRegex.test(time)) {
       throw new Error('Неправильный формат времени');
     }
-
+    if (id !== undefined && typeof id !== 'string') {
+      throw new Error('id должен быть строкой');
+    }
     const existingAlarm = this.alarmCollection.find(alarm => alarm.time === time);
     if (existingAlarm) {
       console.warn('Уже присутствует звонок на это же время');
-      return;
     }
-
-    this.alarmCollection.push({ time, callback, canCall: true });
+    const newAlarm = { time, callback, canCall: true, id: id || Date.now().toString() };
+    this.alarmCollection.push(newAlarm);
+    return newAlarm.id;
   }
 
-  removeClock(time) {
-    const index = this.alarmCollection.findIndex(alarm => alarm.time === time);
+  removeClock(id) {
+    const index = this.alarmCollection.findIndex(alarm => alarm.id === id);
     if (index !== -1) {
       this.alarmCollection.splice(index, 1);
+      return true;
     }
+    return false;
   }
 
   getCurrentFormattedTime() {
     const now = new Date();
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    return `${hours}:${minutes}`;
+    return now.toTimeString().slice(0, 5);
   }
 
   start() {
     if (this.intervalId) {
+      console.warn('Будильник уже запущен');
       return;
     }
-
     if (this.alarmCollection.length === 0) {
       console.warn('Коллекция звонков пуста');
       return;
     }
-
     this.intervalId = setInterval(() => {
       const currentTime = this.getCurrentFormattedTime();
       this.alarmCollection.forEach(alarm => {
         if (alarm.time === currentTime && alarm.canCall) {
           alarm.canCall = false;
-          alarm.callback();
+          try {
+            alarm.callback();
+          } catch (error) {
+            console.error(`Ошибка при выполнении колбэка для будильника ${alarm.id}:`, error);
+          }
         }
       });
     }, 1000);
@@ -62,6 +69,8 @@ class AlarmClock {
     if (this.intervalId) {
       clearInterval(this.intervalId);
       this.intervalId = null;
+    } else {
+      console.warn('Будильник не запущен');
     }
   }
 
@@ -72,17 +81,22 @@ class AlarmClock {
   }
 
   clearAlarms() {
-    this.stop(); // Останавливаем интервал
-    this.alarmCollection.length = 0; // Полностью очищаем коллекцию звонков
+    this.stop();
+    this.alarmCollection = [];
+  }
+
+  printAlarms() {
+    console.log('Текущие будильники:');
+    this.alarmCollection.forEach(alarm => {
+      console.log(`ID: ${alarm.id}, Время: ${alarm.time}, Может быть вызван: ${alarm.canCall}`);
+    });
   }
 }
 
 // Пример использования:
 const alarmClock = new AlarmClock();
-
-alarmClock.addClock('08:00', () => console.log('Пора вставать!'));
-alarmClock.addClock('12:00', () => console.log('Время обеда!'));
-
+const morningAlarmId = alarmClock.addClock('08:00', () => console.log('Пора вставать!'), 'morning');
+const lunchAlarmId = alarmClock.addClock('12:00', () => console.log('Время обеда!'), 'lunch');
 alarmClock.start();
 
 // Чтобы остановить будильник
@@ -91,5 +105,11 @@ alarmClock.start();
 // Чтобы сбросить возможность запуска всех звонков
 // alarmClock.resetAllCalls();
 
+// Чтобы удалить конкретный будильник
+// alarmClock.removeClock(morningAlarmId);
+
 // Чтобы удалить все звонки
 // alarmClock.clearAlarms();
+
+// Чтобы вывести все текущие будильники
+// alarmClock.printAlarms();

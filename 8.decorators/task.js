@@ -43,6 +43,8 @@ function debounceDecoratorNew(func, delay, immediate = false) {
     } else {
       timeoutId = setTimeout(callFunction, delay);
     }
+
+    return wrapper;
   }
 
   wrapper.count = () => callCount;

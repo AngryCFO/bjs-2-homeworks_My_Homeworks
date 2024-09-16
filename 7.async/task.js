@@ -15,11 +15,7 @@ class AlarmClock {
       return;
     }
 
-    this.alarmCollection.push({
-      callback,
-      time,
-      canCall: true
-    });
+    this.alarmCollection.push({ time, callback, canCall: true });
   }
 
   removeClock(time) {
@@ -27,21 +23,20 @@ class AlarmClock {
   }
 
   getCurrentFormattedTime() {
-    const now = new Date();
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const date = new Date();
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
     return `${hours}:${minutes}`;
   }
 
   start() {
-    if (this.intervalId !== null) {
+    if (this.intervalId) {
       return;
     }
 
     this.intervalId = setInterval(() => {
-      const currentTime = this.getCurrentFormattedTime();
       this.alarmCollection.forEach(alarm => {
-        if (alarm.time === currentTime && alarm.canCall) {
+        if (alarm.time === this.getCurrentFormattedTime() && alarm.canCall) {
           alarm.canCall = false;
           alarm.callback();
         }
@@ -65,4 +60,19 @@ class AlarmClock {
     this.alarmCollection = [];
   }
 }
-export { AlarmClock };
+//Пример использования:
+const alarmClock = new AlarmClock();
+
+alarmClock.addClock('08:00', () => console.log('Пора вставать!'));
+alarmClock.addClock('12:00', () => console.log('Время обеда!'));
+
+alarmClock.start();
+
+// Чтобы остановить будильник
+// alarmClock.stop();
+
+// Чтобы сбросить возможность запуска всех звонков
+// alarmClock.resetAllCalls();
+
+// Чтобы удалить все звонки
+// alarmClock.clearAlarms();

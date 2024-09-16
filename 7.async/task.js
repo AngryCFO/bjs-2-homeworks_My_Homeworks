@@ -9,6 +9,11 @@ class AlarmClock {
       throw new Error('Отсутствуют обязательные аргументы');
     }
 
+    const timeRegex = /^([01][0-9]|2[0-3]):[0-5][0-9]$/;
+    if (!timeRegex.test(time)) {
+      throw new Error('Неправильный формат времени');
+    }
+
     const existingAlarm = this.alarmCollection.find(alarm => alarm.time === time);
     if (existingAlarm) {
       console.warn('Уже присутствует звонок на это же время');
@@ -19,18 +24,23 @@ class AlarmClock {
   }
 
   removeClock(time) {
-    this.alarmCollection = this.alarmCollection.filter(alarm => alarm.time !== time);
+    const index = this.alarmCollection.findIndex(alarm => alarm.time === time);
+    if (index !== -1) {
+      this.alarmCollection.splice(index, 1);
+    }
   }
 
   getCurrentFormattedTime() {
-    const date = new Date();
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    return `${hours}:${minutes}`;
+    return new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
   }
 
   start() {
     if (this.intervalId) {
+      return;
+    }
+
+    if (this.alarmCollection.length === 0) {
+      console.warn('Коллекция звонков пуста');
       return;
     }
 
@@ -50,16 +60,25 @@ class AlarmClock {
   }
 
   resetAllCalls() {
+    if (this.alarmCollection.length === 0) {
+      console.warn('Коллекция звонков пуста');
+      return;
+    }
+
     this.alarmCollection.forEach(alarm => {
       alarm.canCall = true;
     });
   }
 
   clearAlarms() {
-    this.stop();
+    if (this.intervalId) {
+      this.stop();
+    }
+
     this.alarmCollection = [];
   }
 }
+
 //Пример использования:
 const alarmClock = new AlarmClock();
 

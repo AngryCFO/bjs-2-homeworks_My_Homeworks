@@ -1,3 +1,5 @@
+import AlarmClock from './AlarmClock.js';
+
 describe('Домашнее задание к лекции 7 «Асинхронность»', () => {
   let clock;
 

@@ -11,12 +11,13 @@ class AlarmClock {
     if (typeof callback !== 'function') {
       throw new Error('Колбэк должен быть функцией');
     }
-    const newAlarm = { time, callback, canCall: true };
-    this.alarmCollection.push(newAlarm);
+    this.alarmCollection.push({ time, callback, canCall: true });
   }
 
   removeClock(time) {
+    const initialLength = this.alarmCollection.length;
     this.alarmCollection = this.alarmCollection.filter(alarm => alarm.time !== time);
+    return initialLength - this.alarmCollection.length;
   }
 
   getCurrentFormattedTime() {

@@ -30,18 +30,19 @@ function debounceDecoratorNew(func, delay, immediate = false) {
   let allCallCount = 0;
 
   function wrapper(...args) {
-    allCallCount++;
+    allCallCount++; // Увеличиваем общее количество вызовов декоратора
 
     const callFunction = () => {
-      callCount++;
+      callCount++; // Увеличиваем количество вызовов функции
       func(...args);
     };
 
     clearTimeout(timeoutId);
     if (immediate && timeoutId === null) {
       callFunction();
+    } else {
+      timeoutId = setTimeout(callFunction, delay);
     }
-    timeoutId = setTimeout(callFunction, delay);
   }
 
   wrapper.count = () => callCount;

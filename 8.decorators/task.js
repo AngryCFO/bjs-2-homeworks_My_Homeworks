@@ -1,27 +1,29 @@
 //Задача № 1
 function cachingDecoratorNew(func) {
-  let cache = new Map(); // Используем Map вместо массива
+  const cache = new Map();
 
   function wrapper(...args) {
-    const hash = md5(JSON.stringify(args)); // Хешируем аргументы
-    const objectInCache = cache.get(hash);
-
-    if (objectInCache !== undefined) { // Проверяем, есть ли элемент в кеше
-      console.log("Из кеша: " + objectInCache);
-      return "Из кеша: " + objectInCache;
+    const hash = md5(JSON.stringify(args));
+    if (cache.has(hash)) {
+      console.log("Из кеша: " + cache.get(hash));
+      return "Из кеша: " + cache.get(hash);
     }
 
-    let result = func(...args); // Вычисляем результат
-    cache.set(hash, result); // Добавляем новый элемент в кеш
+    const result = func(...args);
+    cache.set(hash, result);
+
     if (cache.size > 5) {
-      cache.delete(cache.keys().next().value); // Удаляем самый старый элемент из кеша
+      const oldestKey = cache.keys().next().value;
+      cache.delete(oldestKey);
     }
+
     console.log("Вычисляем: " + result);
     return "Вычисляем: " + result;
   }
 
   return wrapper;
 }
+
 
 //Задача № 2
 function debounceDecoratorNew(func, delay, immediate = false) {
@@ -30,19 +32,19 @@ function debounceDecoratorNew(func, delay, immediate = false) {
   let allCallCount = 0;
 
   function wrapper(...args) {
-    allCallCount++; // Увеличиваем общее количество вызовов декоратора
+    allCallCount++;
 
     const callFunction = () => {
-      callCount++; // Увеличиваем количество вызовов функции
+      callCount++;
       func(...args);
     };
 
-    clearTimeout(timeoutId);
-    if (immediate && timeoutId === null) {
+    if (immediate && !timeoutId) {
       callFunction();
-    } else {
-      timeoutId = setTimeout(callFunction, delay);
     }
+
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(callFunction, delay);
 
     return wrapper;
   }

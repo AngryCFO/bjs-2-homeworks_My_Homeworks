@@ -82,10 +82,7 @@ class AlarmClock {
 
   clearAlarms() {
     this.stop();
-    // Вместо очистки коллекции, устанавливаем canCall в false для всех будильников
-    this.alarmCollection.forEach(alarm => {
-      alarm.canCall = false;
-    });
+    this.alarmCollection = [];
   }
 
   printAlarms() {
@@ -111,7 +108,7 @@ alarmClock.start();
 // Чтобы удалить конкретный будильник
 // alarmClock.removeClock(morningAlarmId);
 
-// Чтобы очистить все звонки (установить canCall в false)
+// Чтобы удалить все звонки
 // alarmClock.clearAlarms();
 
 // Чтобы вывести все текущие будильники

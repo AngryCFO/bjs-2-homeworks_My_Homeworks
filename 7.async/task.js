@@ -75,8 +75,10 @@ clearAlarms() {
     clearInterval(this.intervalId);
   }
   this.alarmCollection = this.alarmCollection.map(alarm => ({ ...alarm, canCall: true }));
+  this.alarmCollection = [];
   this.intervalId = null;
 }
+
 }
 
 //Пример использования:

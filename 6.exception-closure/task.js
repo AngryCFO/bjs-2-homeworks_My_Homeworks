@@ -53,15 +53,12 @@ function getTriangle(a, b, c) {
   }
 }
 
-// Примеры использования
-// Задача 1
-console.log(parseCount("123")); // Должно вернуть 123
-console.log(validateCount("123")); // Должно вернуть 123
-console.log(validateCount("12.3")); // Должно вернуть 12.3
-console.log(validateCount("abc")); // Должно вернуть ошибку
-
-// Задача 2
-console.log(new Triangle(3, 4, 5).area); // Должно вернуть площадь
-console.log(new Triangle(3, 4, 5).perimeter); // Должно вернуть периметр
-console.log(getTriangle(1, 1, 3).area); // Должно вернуть "Ошибка! Треугольник не существует"
-console.log(getTriangle(2, 3, 4).area); // Должно вернуть площадь﻿
+// Экспортируем функции и классы, чтобы они были доступны для тестов
+if (typeof module !== 'undefined') {
+  module.exports = {
+    parseCount,
+    validateCount,
+    Triangle,
+    getTriangle
+  };
+}

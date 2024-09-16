@@ -31,7 +31,10 @@ class AlarmClock {
   }
 
   getCurrentFormattedTime() {
-    return new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
   }
 
   start() {
@@ -45,8 +48,9 @@ class AlarmClock {
     }
 
     this.intervalId = setInterval(() => {
+      const currentTime = this.getCurrentFormattedTime();
       this.alarmCollection.forEach(alarm => {
-        if (alarm.time === this.getCurrentFormattedTime() && alarm.canCall) {
+        if (alarm.time === currentTime && alarm.canCall) {
           alarm.canCall = false;
           alarm.callback();
         }
@@ -55,33 +59,25 @@ class AlarmClock {
   }
 
   stop() {
-    clearInterval(this.intervalId);
-    this.intervalId = null;
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+      this.intervalId = null;
+    }
   }
 
   resetAllCalls() {
-    if (this.alarmCollection.length === 0) {
-      console.warn('Коллекция звонков пуста');
-      return;
-    }
-
     this.alarmCollection.forEach(alarm => {
       alarm.canCall = true;
     });
   }
 
-clearAlarms() {
-  if (this.intervalId) {
-    clearInterval(this.intervalId);
+  clearAlarms() {
+    this.stop();
+    this.alarmCollection.length = 0;
   }
-  this.alarmCollection.forEach(alarm => alarm.canCall = true);
-  this.alarmCollection.length = 0;
-  this.intervalId = null;
 }
 
-}
-
-//Пример использования:
+// Пример использования:
 const alarmClock = new AlarmClock();
 
 alarmClock.addClock('08:00', () => console.log('Пора вставать!'));

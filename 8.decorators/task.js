@@ -45,18 +45,14 @@ function debounceDecoratorNew(fn, delay) {
       }, delay);
     }
 
-    Object.defineProperty(wrapper, 'count', {
-      get: () => callCount,
-      configurable: true
-    });
-
-    Object.defineProperty(wrapper, 'allCount', {
-      get: () => allCallCount,
-      configurable: true
-    });
+    wrapper.count = callCount;
+    wrapper.allCount = allCallCount;
 
     return wrapper;
   };
+
+  wrapper.count = 0;
+  wrapper.allCount = 0;
 
   return wrapper;
 }

@@ -31,10 +31,10 @@ function debounceDecoratorNew(func, delay) {
   let count = 0;
 
   function wrapper(...args) {
-    allCount++;
+    wrapper.incrementAllCount();
     if (timeoutId === null) {
       func(...args);
-      count++;
+      wrapper.incrementCount();
       timeoutId = setTimeout(() => {
         timeoutId = null;
       }, delay);
@@ -42,15 +42,33 @@ function debounceDecoratorNew(func, delay) {
       clearTimeout(timeoutId);
       timeoutId = setTimeout(() => {
         func(...args);
-        count++;
+        wrapper.incrementCount();
       }, delay);
     }
   }
-  wrapper.getCount = function() {
-    return count;
+  wrapper.count = 0;
+  wrapper.allCount = 0;
+  Object.defineProperty(wrapper, 'count', {
+    get: () => count,
+    set: (value) => {
+      count = value;
+      wrapper.count = value;
+    }
+  });
+  Object.defineProperty(wrapper, 'allCount', {
+    get: () => allCount,
+    set: (value) => {
+      allCount = value;
+      wrapper.allCount = value;
+    }
+  });
+  wrapper.incrementCount = () => {
+    count++;
+    wrapper.count++;
   };
-  wrapper.getAllCount = function() {
-    return allCount;
+  wrapper.incrementAllCount = () => {
+    allCount++;
+    wrapper.allCount++;
   };
   return wrapper;
 }

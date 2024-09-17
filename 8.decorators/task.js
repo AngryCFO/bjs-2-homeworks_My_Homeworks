@@ -24,51 +24,42 @@ function cachingDecoratorNew(func) {
 
 
 //Задача № 2
-let allCount = 0;
-
 function debounceDecoratorNew(func, delay) {
   let timeoutId = null;
   let count = 0;
+  let allCount = 0;
 
   function wrapper(...args) {
-    wrapper.incrementAllCount();
+    allCount++;
     if (timeoutId === null) {
       func(...args);
-      wrapper.incrementCount();
-      timeoutId = setTimeout(() => {
-        timeoutId = null;
-      }, delay);
+      count++;
     } else {
       clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        func(...args);
-        wrapper.incrementCount();
-      }, delay);
     }
+    timeoutId = setTimeout(() => {
+      timeoutId = null;
+    }, delay);
   }
-  wrapper.count = 0;
-  wrapper.allCount = 0;
-  Object.defineProperty(wrapper, 'count', {
-    get: () => count,
-    set: (value) => {
-      count = value;
-      wrapper.count = value;
-    }
-  });
-  Object.defineProperty(wrapper, 'allCount', {
-    get: () => allCount,
-    set: (value) => {
-      allCount = value;
-      wrapper.allCount = value;
-    }
-  });
-  wrapper.incrementCount = () => {
-    count++;
-    wrapper.count++;
-  };
-  wrapper.incrementAllCount = () => {
-    allCount++;
-    wrapper.allCount++;
-  };
+
+  wrapper.count = () => count;
+  wrapper.allCount = () => allCount;
+
   return wrapper;
 }
+
+const sendSignal = (signalOrder, delay) => console.log("Сигнал отправлен", signalOrder, delay);
+const upgradedSendSignal = debounceDecoratorNew(sendSignal, 2000);
+
+setTimeout(() => upgradedSendSignal(1, 0));
+setTimeout(() => upgradedSendSignal(2, 300), 300);
+setTimeout(() => upgradedSendSignal(3, 900), 900);
+setTimeout(() => upgradedSendSignal(4, 1200), 1200);
+setTimeout(() => upgradedSendSignal(5, 2300), 2300);
+setTimeout(() => upgradedSendSignal(6, 4400), 4400);
+setTimeout(() => upgradedSendSignal(7, 4500), 4500);
+
+setTimeout(() => {
+  console.log(upgradedSendSignal.count()); // было выполнено 3 отправки сигнала
+  console.log(upgradedSendSignal.allCount()); // было выполнено 7 вызовов декорированной функции
+}, 7000)

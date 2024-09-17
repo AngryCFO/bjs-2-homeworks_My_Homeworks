@@ -1,54 +1,50 @@
 //Задача № 1
 function cachingDecoratorNew(func) {
-  let cache = new Map(); // Используем Map вместо массива
+  let cache = [];
 
   function wrapper(...args) {
-    const hash = md5(JSON.stringify(args)); // Хешируем аргументы
-    const objectInCache = cache.get(hash);
+    const hash = md5(args);
+    let objectInCache = cache.find((item) => item.hash === hash);
 
-    if (objectInCache !== undefined) { // Проверяем, есть ли элемент в кеше
-      console.log("Из кеша: " + objectInCache);
-      return "Из кеша: " + objectInCache;
+    if (objectInCache) {
+      console.log("Из кеша: " + objectInCache.value);
+      return "Из кеша: " + objectInCache.value;
     }
 
-    let result = func(...args); // Вычисляем результат
-    cache.set(hash, result); // Добавляем новый элемент в кеш
-    if (cache.size > 5) {
-      cache.delete(cache.keys().next().value); // Удаляем самый старый элемент из кеша
+    let result = func(...args);
+    cache.push({ hash, value: result });
+    if (cache.length > 5) {
+      cache.shift();
     }
     console.log("Вычисляем: " + result);
     return "Вычисляем: " + result;
   }
-
   return wrapper;
 }
+
 
 //Задача № 2
-function debounceDecoratorNew(func, delay, immediate = false) {
+let allCount = 0;
+
+function debounceDecoratorNew(func, delay) {
   let timeoutId = null;
-  let callCount = 0;
-  let allCallCount = 0;
+  let count = 0;
 
   function wrapper(...args) {
-    allCallCount++; // Увеличиваем общее количество вызовов декоратора
-
-    const callFunction = () => {
-      callCount++; // Увеличиваем количество вызовов функции
+    if (timeoutId === null) {
       func(...args);
-    };
-
-    clearTimeout(timeoutId);
-    if (immediate && timeoutId === null) {
-      callFunction();
+      count++;
+      allCount++;
     } else {
-      timeoutId = setTimeout(callFunction, delay);
+      clearTimeout(timeoutId);
     }
-
-    return wrapper;
+    timeoutId = setTimeout(() => {
+      timeoutId = null;
+    }, delay);
+    allCount++;
   }
-
-  wrapper.count = () => callCount;
-  wrapper.allCount = () => allCallCount;
-
+  wrapper.count = () => count;
+  wrapper.allCount = () => allCount;
   return wrapper;
 }
+

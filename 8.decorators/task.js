@@ -46,7 +46,11 @@ function debounceDecoratorNew(func, delay) {
       }, delay);
     }
   }
-  wrapper.count = count;
-  wrapper.allCount = allCount;
+  wrapper.getCount = function() {
+    return count;
+  };
+  wrapper.getAllCount = function() {
+    return allCount;
+  };
   return wrapper;
 }

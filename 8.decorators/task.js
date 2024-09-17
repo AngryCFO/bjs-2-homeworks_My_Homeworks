@@ -42,24 +42,13 @@ function debounceDecoratorNew(func, delay) {
     }, delay);
   }
 
-  wrapper.count = () => count;
-  wrapper.allCount = () => allCount;
+  wrapper.getCount = function() {
+    return count;
+  };
+
+  wrapper.getAllCount = function() {
+    return allCount;
+  };
 
   return wrapper;
 }
-
-const sendSignal = (signalOrder, delay) => console.log("Сигнал отправлен", signalOrder, delay);
-const upgradedSendSignal = debounceDecoratorNew(sendSignal, 2000);
-
-setTimeout(() => upgradedSendSignal(1, 0));
-setTimeout(() => upgradedSendSignal(2, 300), 300);
-setTimeout(() => upgradedSendSignal(3, 900), 900);
-setTimeout(() => upgradedSendSignal(4, 1200), 1200);
-setTimeout(() => upgradedSendSignal(5, 2300), 2300);
-setTimeout(() => upgradedSendSignal(6, 4400), 4400);
-setTimeout(() => upgradedSendSignal(7, 4500), 4500);
-
-setTimeout(() => {
-  console.log(upgradedSendSignal.count()); // было выполнено 3 отправки сигнала
-  console.log(upgradedSendSignal.allCount()); // было выполнено 7 вызовов декорированной функции
-}, 7000)

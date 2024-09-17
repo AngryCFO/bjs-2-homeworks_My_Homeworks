@@ -24,35 +24,48 @@ function cachingDecoratorNew(func) {
 
 
 //Задача № 2
-function debounceDecoratorNew(func, delay) {
-  let timeoutId = null;
-  let count = 0;
-  let allCount = 0;
+function debounceDecoratorNew(fn, delay) {
+  let timeoutId;
+  let isFirstCall = true;
+  let callCount = 0;
+  let allCallCount = 0;
 
-  function wrapper(...args) {
-    allCount++;
-    if (timeoutId === null) {
-      func(...args);
-      count++;
+  const wrapper = (...args) => {
+    allCallCount++;
+
+    if (isFirstCall) {
+      isFirstCall = false;
+      fn.apply(this, args);
+      callCount++;
     } else {
       clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        fn.apply(this, args);
+        callCount++;
+      }, delay);
     }
-    timeoutId = setTimeout(() => {
-      timeoutId = null;
-    }, delay);
-  }
 
-  Object.defineProperty(wrapper, 'count', {
-    get: function() {
-      return count;
-    }
-  });
+    wrapper.count = callCount;
+    wrapper.allCount = allCallCount;
 
-  Object.defineProperty(wrapper, 'allCount', {
-    get: function() {
-      return allCount;
-    }
-  });
+    return wrapper;
+  };
 
   return wrapper;
 }
+
+const sendSignal = (signalOrder, delay) => console.log("Сигнал отправлен", signalOrder, delay);
+const upgradedSendSignal = debounceDecoratorNew(sendSignal, 2000);
+
+setTimeout(() => upgradedSendSignal(1, 0)); // Сигнал отправлен 1 0
+setTimeout(() => upgradedSendSignal(2, 300), 300); // проигнорировано
+setTimeout(() => upgradedSendSignal(3, 900), 900); // проигнорировано
+setTimeout(() => upgradedSendSignal(4, 1200), 1200); // проигнорировано
+setTimeout(() => upgradedSendSignal(5, 2300), 2300); // Сигнал отправлен 5 2300
+setTimeout(() => upgradedSendSignal(6, 4400), 4400); // проигнорировано
+setTimeout(() => upgradedSendSignal(7, 4500), 4500); // Сигнал отправлен 7 4500
+
+setTimeout(() => {
+  console.log(upgradedSendSignal.count); // 3
+  console.log(upgradedSendSignal.allCount); // 6
+}, 7000);

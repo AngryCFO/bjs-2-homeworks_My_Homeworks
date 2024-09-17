@@ -54,4 +54,3 @@ function debounceDecoratorNew(func, delay, immediate = false) {
 
   return wrapper;
 }
-

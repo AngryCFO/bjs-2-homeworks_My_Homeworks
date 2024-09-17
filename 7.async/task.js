@@ -64,6 +64,11 @@ class AlarmClock {
   this.stop();
   this.alarmCollection = [];
   this.resetAllCalls();
+
+  // Добавляем проверку, что количество будильников равно 0
+  if (this.alarmCollection.length !== 0) {
+    throw new Error('Не все будильники были удалены');
+  }
 }
 
 }

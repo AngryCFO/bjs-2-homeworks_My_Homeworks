@@ -1,29 +1,27 @@
 //Задача № 1
 function cachingDecoratorNew(func) {
-  const cache = new Map();
+  let cache = new Map(); // Используем Map вместо массива
 
   function wrapper(...args) {
-    const hash = md5(JSON.stringify(args));
-    if (cache.has(hash)) {
-      console.log("Из кеша: " + cache.get(hash));
-      return "Из кеша: " + cache.get(hash);
+    const hash = md5(JSON.stringify(args)); // Хешируем аргументы
+    const objectInCache = cache.get(hash);
+
+    if (objectInCache !== undefined) { // Проверяем, есть ли элемент в кеше
+      console.log("Из кеша: " + objectInCache);
+      return "Из кеша: " + objectInCache;
     }
 
-    const result = func(...args);
-    cache.set(hash, result);
-
+    let result = func(...args); // Вычисляем результат
+    cache.set(hash, result); // Добавляем новый элемент в кеш
     if (cache.size > 5) {
-      const oldestKey = cache.keys().next().value;
-      cache.delete(oldestKey);
+      cache.delete(cache.keys().next().value); // Удаляем самый старый элемент из кеша
     }
-
     console.log("Вычисляем: " + result);
     return "Вычисляем: " + result;
   }
 
   return wrapper;
 }
-
 
 //Задача № 2
 function debounceDecoratorNew(func, delay, immediate = false) {
@@ -32,24 +30,23 @@ function debounceDecoratorNew(func, delay, immediate = false) {
   let allCallCount = 0;
 
   function wrapper(...args) {
-    allCallCount++;
+    allCallCount++; // Увеличиваем общее количество вызовов декоратора
 
     const callFunction = () => {
-      callCount++;
+      callCount++; // Увеличиваем количество вызовов функции
       func(...args);
     };
 
-    if (immediate && !timeoutId) {
-      callFunction();
-    }
-
     clearTimeout(timeoutId);
-    timeoutId = setTimeout(callFunction, delay);
+    if (immediate && timeoutId === null) {
+      callFunction();
+    } else {
+      timeoutId = setTimeout(callFunction, delay);
+    }
 
     return wrapper;
   }
 
-  // Методы для получения количества вызовов
   wrapper.count = () => callCount;
   wrapper.allCount = () => allCallCount;
 

@@ -42,13 +42,17 @@ function debounceDecoratorNew(func, delay) {
     }, delay);
   }
 
-  wrapper.getCount = function() {
-    return count;
-  };
+  Object.defineProperty(wrapper, 'count', {
+    get: function() {
+      return count;
+    }
+  });
 
-  wrapper.getAllCount = function() {
-    return allCount;
-  };
+  Object.defineProperty(wrapper, 'allCount', {
+    get: function() {
+      return allCount;
+    }
+  });
 
   return wrapper;
 }

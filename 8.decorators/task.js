@@ -45,9 +45,6 @@ function debounceDecoratorNew(fn, delay) {
       }, delay);
     }
 
-    wrapper.count = callCount;
-    wrapper.allCount = allCallCount;
-
     return wrapper;
   };
 
@@ -57,18 +54,73 @@ function debounceDecoratorNew(fn, delay) {
   return wrapper;
 }
 
-const sendSignal = (signalOrder, delay) => console.log("Сигнал отправлен", signalOrder, delay);
-const upgradedSendSignal = debounceDecoratorNew(sendSignal, 2000);
+describe("Домашнее задание к занятию 8 «Функции декораторы» > Задача №2 Усовершенствованный декоратор отложенного вызова", () => {
+  it("Декоратор выполняет первый синхронный вызов функции", () => {
+    let hasCalled = false;
+    const functionToDecorate = () => {
+      console.log("тук тук");
+      hasCalled = !hasCalled;
+    };
+    const decoratedFunction = debounceDecoratorNew(functionToDecorate, 100);
+    decoratedFunction(1, 2, 3);
+    expect(hasCalled).toBe(true);
+  });
 
-setTimeout(() => upgradedSendSignal(1, 0)); // Сигнал отправлен 1 0
-setTimeout(() => upgradedSendSignal(2, 300), 300); // проигнорировано
-setTimeout(() => upgradedSendSignal(3, 900), 900); // проигнорировано
-setTimeout(() => upgradedSendSignal(4, 1200), 1200); // проигнорировано
-setTimeout(() => upgradedSendSignal(5, 2300), 2300); // Сигнал отправлен 5 2300
-setTimeout(() => upgradedSendSignal(6, 4400), 4400); // проигнорировано
-setTimeout(() => upgradedSendSignal(7, 4500), 4500); // Сигнал отправлен 7 4500
+  it("Декоратор выполнит второй вызов асинхронно функции", (done) => {
+    let hasCalled = false;
+    const functionToDecorate = () => {
+      console.log("тук тук");
+      hasCalled = !hasCalled;
+    };
+    const decoratedFunction = debounceDecoratorNew(functionToDecorate, 100);
+    decoratedFunction(1, 2, 3);
+    expect(hasCalled).toBe(true);
 
-setTimeout(() => {
-  console.log(upgradedSendSignal.count); // 3
-  console.log(upgradedSendSignal.allCount); // 6
-}, 7000);
+    decoratedFunction(1, 2, 3);
+    expect(hasCalled).toBe(true);
+
+    setTimeout(() => {
+      expect(hasCalled).toBe(false);
+      done();
+    }, 150);
+  });
+
+  it("Декоратор считает общее количество вызовов функции", () => {
+    const functionToDecorate = () => console.log("тук тук");
+    const decoratedFunction = debounceDecoratorNew(functionToDecorate, 100);
+    expect(decoratedFunction.allCount).toBe(0);
+    decoratedFunction(1, 2, 3);
+    expect(decoratedFunction.allCount).toBe(1);
+
+    decoratedFunction(1, 2, 3);
+    expect(decoratedFunction.allCount).toBe(2);
+  });
+
+  it("Декоратор считает количество вызовов переданной функции", (done) => {
+    const functionToDecorate = () => console.log("тук тук");
+    const decoratedFunction = debounceDecoratorNew(functionToDecorate, 100);
+    expect(decoratedFunction.count).toBe(0);
+    decoratedFunction(1, 2, 3);
+    expect(decoratedFunction.count).toBe(1);
+
+    decoratedFunction(1, 2, 3);
+    expect(decoratedFunction.count).toBe(1);
+
+    setTimeout(() => {
+      decoratedFunction(1, 2, 3);
+      expect(decoratedFunction.count).toBe(2);
+    }, 150);
+
+    setTimeout(() => {
+      decoratedFunction(1, 2, 3);
+      expect(decoratedFunction.count).toBe(2);
+    }, 200);
+
+    setTimeout(() => {
+      decoratedFunction(1, 2, 3);
+      expect(decoratedFunction.count).toBe(3);
+      expect(decoratedFunction.allCount).toBe(5);
+      done();
+    }, 400);
+  });
+});

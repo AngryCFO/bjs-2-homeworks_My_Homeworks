@@ -49,6 +49,7 @@ function debounceDecoratorNew(func, delay, immediate = false) {
     return wrapper;
   }
 
+  // Методы для получения количества вызовов
   wrapper.count = () => callCount;
   wrapper.allCount = () => allCallCount;
 
